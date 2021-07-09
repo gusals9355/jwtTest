@@ -21,8 +21,8 @@ public class RestApiController {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @GetMapping("/home")
-    public String home(@AuthenticationPrincipal PrincipalDetails principalDetails){
-        System.out.println(principalDetails.getUser());
+    public String home(){
+//        System.out.println(principalDetails.getUser());
         return "home";
     }
 
@@ -49,5 +49,9 @@ public class RestApiController {
         String hashPw = bCryptPasswordEncoder.encode(user.getPassword());
         user.setPassword(hashPw);
         userRepository.save(user);
+    }
+    @GetMapping("/admin")
+    public void admin(){
+
     }
 }

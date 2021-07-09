@@ -11,8 +11,7 @@
     <form action="/join" method="post">
         <input type="text" name="username" value="123">
         <input type="password" name="password" value="123">
-        <input type="submit" value="로그인">
+        <input type="submit" value="회원가입">
     </form>
-
 </body>
 </html>

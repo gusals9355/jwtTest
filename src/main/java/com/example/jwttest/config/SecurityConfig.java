@@ -3,6 +3,8 @@ package com.example.jwttest.config;
 import com.example.jwttest.filter.MyFilter1;
 import com.example.jwttest.filter.MyFilter2;
 import com.example.jwttest.jwt.JwtAuthenticationFilter;
+import com.example.jwttest.jwt.JwtAuthorizationFilter;
+import com.example.jwttest.model.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.ast.And;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +25,7 @@ import org.springframework.web.filter.CorsFilter;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final CorsFilter corsFilter;
-
+    private final UserRepository userRepository;
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder(){
         return new BCryptPasswordEncoder();
@@ -31,9 +33,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable();
-        http.httpBasic();
-
         http
             .csrf().disable()
             .httpBasic()
@@ -51,6 +50,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .addFilterBefore(new MyFilter1(), SecurityContextPersistenceFilter.class)
             .addFilter(corsFilter)
             .addFilter(new JwtAuthenticationFilter(authenticationManager()))
+            .addFilter(new JwtAuthorizationFilter(authenticationManager(), userRepository))
 
             .formLogin()
             .loginPage("/login")
