@@ -1,6 +1,7 @@
 package com.example.jwttest.jwt;
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.example.jwttest.auth.PrincipalDetails;
 import com.example.jwttest.model.User;
@@ -27,20 +28,20 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         this.userRepository = userRepository;
     }
 
-    //인증이나 권한이 필요한 주소요청이 있을때 해당 필터를 타게됨
+    //아닌거같은데 jwt토큰을 받고 내어보내는 endpoint?  인증
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        System.out.println("인증이나 권한이 필요한 주소입니다 basicAuthenticationFitler");
-        String header = request.getHeader("Authorization");
+        System.out.println("인증이나 권한이 필요한 주소 basicAuthenticationFitler");
+        String header = request.getHeader(JwtProperties.HEADER_STRING);
         System.out.println("header:"+header);
 
-        if(header ==null || !header.startsWith("Bearer")){
+        if(header ==null || !header.startsWith(JwtProperties.TOKEN_PREFIX)){
             chain.doFilter(request,response);
             return;
         }
         //jwt 토큰을 검증해서 정상적인 사용자인지 확인
-        String token = request.getHeader("Authorization").replace("Bearer ","");
-        String username = JWT.require(Algorithm.HMAC512("cos")).build().verify(token).getClaim("username").asString();
+        String token = request.getHeader(JwtProperties.HEADER_STRING).replace(JwtProperties.TOKEN_PREFIX,"");
+        String username = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build().verify(token).getClaim("username").asString();
         //서명이 정상적으로 됨
         if(username !=null){
             User user = userRepository.findByUsername(username);

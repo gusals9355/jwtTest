@@ -47,7 +47,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .anyRequest().permitAll()
 
             .and()
-            .addFilterBefore(new MyFilter1(), SecurityContextPersistenceFilter.class)
+//            .addFilterBefore(new MyFilter1(), SecurityContextPersistenceFilter.class)
             .addFilter(corsFilter)
             .addFilter(new JwtAuthenticationFilter(authenticationManager()))
             .addFilter(new JwtAuthorizationFilter(authenticationManager(), userRepository))

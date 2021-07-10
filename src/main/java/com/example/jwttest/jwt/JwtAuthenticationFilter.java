@@ -70,10 +70,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         //rsa방식보단 hmac방식을 많이 이용함
         String jwtToken = JWT.create()
                 .withSubject(principalDetails.getUsername()) // 크게 의미없음
-                .withExpiresAt(new Date(System.currentTimeMillis() + 3600000)) //토큰의 만료시간 1시간
+                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATTION_TIME)) //토큰의 만료시간 1시간
                 .withClaim("id",principalDetails.getUser().getIuser())
                 .withClaim("username",principalDetails.getUser().getUsername())
-                .sign(Algorithm.HMAC256("cos"));
-        response.addHeader("Authorization","Bearer " +jwtToken);
+                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
+        response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX+jwtToken);
     }
 }

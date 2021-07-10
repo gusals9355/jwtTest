@@ -50,6 +50,10 @@ public class RestApiController {
         user.setPassword(hashPw);
         userRepository.save(user);
     }
+    @GetMapping("/user")
+    public void user(){
+
+    }
     @GetMapping("/admin")
     public void admin(){
 

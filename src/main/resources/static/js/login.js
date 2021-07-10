@@ -13,8 +13,5 @@ buttonElem.addEventListener('click', function () {
             username: idValue,
             password: pwValue
         })
-    }).then(res => res.json())
-    .then(myJson => {
-
     })
 })
