@@ -1,7 +1,5 @@
 package com.example.jwttest.config;
 
-import com.example.jwttest.filter.MyFilter1;
-import com.example.jwttest.filter.MyFilter2;
 import com.example.jwttest.jwt.JwtAuthenticationFilter;
 import com.example.jwttest.jwt.JwtAuthorizationFilter;
 import com.example.jwttest.model.UserRepository;
@@ -47,7 +45,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .anyRequest().permitAll()
 
             .and()
-//            .addFilterBefore(new MyFilter1(), SecurityContextPersistenceFilter.class)
             .addFilter(corsFilter)
             .addFilter(new JwtAuthenticationFilter(authenticationManager()))
             .addFilter(new JwtAuthorizationFilter(authenticationManager(), userRepository))
