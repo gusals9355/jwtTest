@@ -1,10 +1,11 @@
 package com.example.jwttest.jwt;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.example.jwttest.auth.PrincipalDetails;
 import com.example.jwttest.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Header;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Date;
 
 //스프링 시큐리티에서 UsernamePasswordAuthenticationFilter가 있음
@@ -68,12 +70,20 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         PrincipalDetails principalDetails = (PrincipalDetails) authResult.getPrincipal();
 
         //rsa방식보단 hmac방식을 많이 이용함
-        String jwtToken = JWT.create()
-                .withSubject(principalDetails.getUsername()) // 크게 의미없음
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATTION_TIME)) //토큰의 만료시간 1시간
-                .withClaim("id",principalDetails.getUser().getIuser())
-                .withClaim("username",principalDetails.getUser().getUsername())
-                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
-        response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX+jwtToken);
+        String jwtToken = Jwts.builder()
+                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
+//                .withSubject(principalDetails.getUsername()) // 크게 의미없음
+//                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATTION_TIME)) //토큰의 만료시간 1시간
+                .setIssuer("fresh") // (2)
+                .setIssuedAt(new Date()) // (3)
+                .setExpiration(new Date(System.currentTimeMillis()+ JwtProperties.EXPIRATTION_TIME))
+//                .withClaim("id",principalDetails.getUser().getIuser())
+                .claim("id",principalDetails.getUser().getIuser())
+//                .withClaim("username",principalDetails.getUser().getUsername())
+                .claim("username", principalDetails.getUser().getUsername())
+//                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
+                .signWith(SignatureAlgorithm.HS512, JwtProperties.SECRET)
+                .compact();
+        response.setHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX+jwtToken);
     }
 }

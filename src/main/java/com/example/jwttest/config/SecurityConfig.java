@@ -33,9 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
             .csrf().disable()
-            .httpBasic()
-
-            .and()
+            .httpBasic().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) //세션 사용 X
 
             .and()

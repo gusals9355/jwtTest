@@ -1,11 +1,10 @@
 package com.example.jwttest.jwt;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.example.jwttest.auth.PrincipalDetails;
 import com.example.jwttest.model.User;
 import com.example.jwttest.model.UserRepository;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -28,7 +27,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         this.userRepository = userRepository;
     }
 
-    //아닌거같은데 jwt토큰을 받고 내어보내는 endpoint?  인증
+    //jwt토큰을 받고 내어보내는 endpoint?  인증
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         System.out.println("인증이나 권한이 필요한 주소 basicAuthenticationFitler");
@@ -41,9 +40,17 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         }
         //jwt 토큰을 검증해서 정상적인 사용자인지 확인
         String token = request.getHeader(JwtProperties.HEADER_STRING).replace(JwtProperties.TOKEN_PREFIX,"");
-        String username = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build().verify(token).getClaim("username").asString();
+//        String username =
+//                JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build().verify(token).getClaim("username").asString();
+        Claims claims=
+                Jwts.parser()
+                .setSigningKey(JwtProperties.SECRET)
+                .parseClaimsJws(token).getBody();
+        String username = (String) claims.get("username");
         //서명이 정상적으로 됨
+        System.out.println("여기온다");
         if(username !=null){
+        System.out.println("여기못온다");
             User user = userRepository.findByUsername(username);
 
             PrincipalDetails principalDetails = new PrincipalDetails(user);
