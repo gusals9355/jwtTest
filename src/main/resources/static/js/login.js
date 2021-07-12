@@ -13,9 +13,5 @@ buttonElem.addEventListener('click', function () {
             username: idValue,
             password: pwValue
         })
-    }).then(res => res.json())
-        .then(token => {
-            localStorage.setItem("jwt", token)
-            alert('로그인됨')
-        })
+    })
 })

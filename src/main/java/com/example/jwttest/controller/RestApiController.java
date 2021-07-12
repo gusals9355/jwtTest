@@ -53,8 +53,8 @@ public class RestApiController {
         userRepository.save(user);
     }
     @GetMapping("/user")
-    public void user(){
-
+    public void user(@AuthenticationPrincipal PrincipalDetails principalDetails){
+        System.out.println(principalDetails.getUser());
     }
     @GetMapping("/admin")
     public void admin(){

@@ -7,18 +7,22 @@ import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.buf.Utf8Decoder;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.codec.Utf8;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.time.Duration;
 import java.util.Date;
 
@@ -42,7 +46,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 //            }
             ObjectMapper om = new ObjectMapper();
             User user = om.readValue(request.getInputStream(), User.class);
-            System.out.println(user);
 
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
@@ -72,18 +75,19 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         //rsa방식보단 hmac방식을 많이 이용함
         String jwtToken = Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
-//                .withSubject(principalDetails.getUsername()) // 크게 의미없음
-//                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATTION_TIME)) //토큰의 만료시간 1시간
                 .setIssuer("fresh") // (2)
                 .setIssuedAt(new Date()) // (3)
                 .setExpiration(new Date(System.currentTimeMillis()+ JwtProperties.EXPIRATTION_TIME))
-//                .withClaim("id",principalDetails.getUser().getIuser())
                 .claim("id",principalDetails.getUser().getIuser())
-//                .withClaim("username",principalDetails.getUser().getUsername())
                 .claim("username", principalDetails.getUser().getUsername())
-//                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
                 .signWith(SignatureAlgorithm.HS512, JwtProperties.SECRET)
                 .compact();
-        response.setHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX+jwtToken);
+
+        Cookie cookie = new Cookie(JwtProperties.HEADER_STRING, jwtToken);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(3600); //60*60
+        response.addCookie(cookie);
+
     }
 }

@@ -2,12 +2,14 @@ package com.example.jwttest.config;
 
 import com.example.jwttest.jwt.JwtAuthenticationFilter;
 import com.example.jwttest.jwt.JwtAuthorizationFilter;
+import com.example.jwttest.jwt.JwtProperties;
 import com.example.jwttest.model.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.ast.And;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -49,6 +51,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
             .formLogin()
             .loginPage("/login")
-            .defaultSuccessUrl("/home");
+            .loginProcessingUrl("/login")
+            .defaultSuccessUrl("/home")
+            .and()
+            .logout()
+            .logoutSuccessUrl("/home")
+            .deleteCookies(JwtProperties.HEADER_STRING);
     }
+
 }
