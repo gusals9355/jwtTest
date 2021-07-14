@@ -5,7 +5,6 @@ import com.example.jwttest.jwt.JwtAuthorizationFilter;
 import com.example.jwttest.jwt.JwtProperties;
 import com.example.jwttest.model.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.And;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,9 +13,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.web.filter.CorsFilter;
 
 @Configuration
@@ -59,4 +55,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .deleteCookies(JwtProperties.HEADER_STRING);
     }
 
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/favicon/**","/home");
+    }
 }
